@@ -1,6 +1,7 @@
-# Diagramas de secuencia
+# Diagramas UML TP6
 
-## a. Ingreso de nuevo cliente
+## Diagramas de secuencia TP6 - ejercicio 1
+### a. Ingreso de nuevo cliente
 
 ```mermaid
 sequenceDiagram
@@ -172,3 +173,197 @@ sequenceDiagram
     a->>+l: getLogByTicket(ticket.ID)
     l-->>-a: return Descripción
 ```
+
+
+
+
+
+## Ejercicio 2
+
+### a. Ingreso de nuevo cliente
+
+```mermaid
+
+graph TD
+    A([ ]) --> B[Verificar CUIT en ARCA: get CUIT]
+    B --> C{CUIT valido?}
+    C -- error --> D[Mostrar error en el CUIT] --> E([ ])
+    C -- ok --> F[nuevo cliente: new Nombre, telefono, CUIT, E-mail, password]
+
+```
+
+### b. registro nuevo cliente
+```mermaid
+
+graph TD
+    A([ ]) --> B[registrar cliente: register ID]
+    B --> C{Registro OK}
+    C -- error --> D[Mostrar error Registro] --> E([X])
+    C -- ok --> F[Confirmar registro] --> G([ ])
+```
+
+### c. acceso de nuevo cliente
+```mermaid
+
+graph TD
+    A([ ]) --> B[Solicitar Login: login ID, Password]
+    B --> C{Login?}
+    C -- ok --> D[Login confirmado] --> E([ ])
+    C -- error --> F[informar error de Credenciales] --> G([X])
+
+```
+
+### d. cambio de password de cliente
+```mermaid
+
+graph TD
+    A([ ]) --> B[Ingresar contrasena actual, nueva y confirmacion]
+    B --> C[Validar contrasena actual]
+    C --> D{ }
+    D -- invalida --> E[Mostrar error de autenticacion] --> F([X])
+    D -- Ok --> G[Validar formato y coincidencia]
+    G --> H{ }
+    H -- incorrecto --> I[Mostrar error de formato] --> J([X])
+    H -- Ok --> K[Actualizar base de datos]
+    K --> L[Mostrar confirmacion de exito] --> M([ ])
+
+```
+## e. Actualización de datos de cliente
+```mermaid
+flowchart TD
+    Start(( )) --> A["ingresa ID y Password:\nLogin(id.cliente, password)"]
+    A --> B{"verifica ID y Password"}
+    
+    B --> C>"Mensaje error"]
+    C --> A
+    
+    B --> D["Login Exitoso"]
+    D --> E["get(ID)\nobtengo datos actuales"]
+    E --> F["Mostrar datos del cliente"]
+    F --> G{"¿Estado = dado de baja?"}
+    
+    G -- "si" --> H(("X"))
+    
+    G --> I["Modificar datos"]
+    I --> J["set(ID, Nombre, Teléfono,\nCUIT, E-Mail, Password)"]
+    J --> K["new(Ticket.ID, Descripcion)\nRegistrar en LogAuditoria"]
+    K --> L{"¿Operación correcta?"}
+    
+    L -- "no" --> M>"Mensaje error"]
+    M --> I
+    
+    L --> N["Mostrar datos actualizados"]
+    N --> End((( )))
+
+    Nota["Los datos quedan\nactualizados en\nel sistema"] -.- L
+```
+
+## f. Abrir nuevo ticket
+```mermaid
+flowchart LR
+    Start(( )) --> A["ingresar usuario:\nlogin(ID,password)"]
+    A --> B["crear ticket:\nnew(Descricion,cliente.ID)"]
+    B --> C{"¿Se registro?"}
+    
+    C -- "no" --> D>"informar error"]
+    D --> End1((( )))
+    
+    C --> E["registrar en logAuditoria:\nnew(ticket.ID,descricion)"]
+    E --> End2((( )))
+```
+
+## g. Actualizar ticket
+```mermaid
+flowchart LR
+    Start(( )) --> A["ingresa ID y Password:\nLogin(id.cliente, password)"]
+    A --> B{"verifica ID y Password"}
+    
+    B -- "error" --> C>"Mensaje error"]
+    C --> A
+    
+    B -- "ok" --> D["Actualizar Descripción del\nTicket: set(descripcion)"]
+    D --> E["Solicitar registro de auditoria\nNew(Ticket.ID, Descripcion)"]
+    E --> F{"¿registro creado\ncorrectamente?"}
+    
+    F --> G>"Mensaje error"]
+    G --> End1((( )))
+    
+    F -- "ok" --> H["Mostrar datos actualizados"]
+    H --> End2((( )))
+```
+
+## h. Consultar tickets existentes
+```mermaid
+flowchart TD
+    Start(( )) --> A["Solicitar Login con Credenciales:\nlogin(ID, password)"]
+    A --> B{" "}
+    
+    B -- "error" --> C>"Informar error de Login"]
+    C --> X1(("X"))
+    
+    B -- "ok" --> D["Consultar tickets:\ngetTicketByCliente(Cliente.ID)"]
+    D --> E{" "}
+    
+    E -- "error" --> F>"Informar error de consulta"]
+    F --> X2(("X"))
+    
+    E -- "ok" --> G["Mostrar datos de tickets:\n(ID, Descripción, Estado, Fecha_creación,\nFecha_cierre)"]
+    G --> End((( )))
+```
+
+## i. Borrar ticket
+```mermaid
+flowchart TD
+    Start(( )) --> A["buscar ticket:\nget(id)"]
+    A --> B{"¿existe el ticket?"}
+    
+    B -- "error" --> C["informar error"]
+    C --> End1((( )))
+    
+    B -- "ok" --> D["ver estado:\nstatus(cerrado)"]
+    D --> E["crear registro\nnew(Ticket.ID,\nDescripcion)"]
+    E --> F{"¿se registro log?"}
+    
+    F -- "error" --> G["informar error"]
+    G --> End2((( )))
+    
+    F -- "ok" --> H["borrar ticket o cerrado"]
+    H --> End3((( )))
+```
+
+
+
+## Ejercicio 3
+## Diagrama de estados de un cliente
+```mermaid
+stateDiagram-v2
+    [*] --> inactivo : new(Nombre, Teléfono, CUIT, E-mail, Password)
+    inactivo --> Activo : register(ID)
+    inactivo --> Baja : status(Estado)
+    Activo --> Baja : status(Estado)
+    Baja --> [*]
+
+    note right of Baja
+        Si Estado == Baja no se
+        puede cambiar
+    end note
+```
+
+
+## Ejercicio 4
+## 4. Diagrama de estados de un tickect
+```mermaid
+
+stateDiagram-v2
+    [*] --> Abierto: new(Description,Cliente.ID)
+    
+    Abierto --> En_proceso: status(Estado)
+    En_proceso --> Cerrado: status(Estado)
+    
+    Abierto --> Cerrado: status(Estado)
+    Cerrado --> Abierto: status(Estado)
+    
+    Cerrado --> [*]
+
+```
+
